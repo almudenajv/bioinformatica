@@ -1,0 +1,3 @@
+Nombre	Apellidos	Edad	Mascotas
+Almudena	Jarillo Vioque	21	Chester
+Sofia	Salazar Jimeno	20	Paula
