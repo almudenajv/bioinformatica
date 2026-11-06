@@ -1,0 +1,193 @@
+> ##########################################################################################
+> #####################                                        			##################
+> #####################    TRABAJO ORDINARIA BIOINFORMÁTICA R             ##################
+> #####################                                       			##################
+> ##########################################################################################
+> 
+> getwd()
+[1] "/Users/almudenajarillo/Desktop/uni/bioinformatica /R/trabajo final"
+> ### 1.- Carga el archivo de entrada "archivo-entrada.txt" correspondiente. 
+> ### Recuerda incluir los nombres de las columnas como el encabezado.
+> ### Examina el archivo con las funciones head(), tail() y dim(). (1 pto)
+> 
+> # Carga del archivo de entrada
+> data <- read.table("archivo-entrada.txt", header = TRUE, row.names = 1, sep = "\t", dec = ".")
+> 
+> # Examen de los datos
+> dim(data)    # Muestra las dimensiones (filas y columnas)
+[1] 619   6
+> head(data)   # Muestra las primeras filas
+        C2.TPM    C1.TPM    C3.TPM  X1W5.TPM  X1W6.TPM  X1W5.COV
+urtA  30.40059  34.71058  32.35147  0.000000  0.000000  0.000000
+recQ 101.01847 107.75805 107.83519  3.457582 10.163883  3.312236
+kdsA  60.78179  57.62743  59.47843  0.000000 12.250913  0.000000
+lysA 129.41655 109.94573 126.75361 24.608057 32.755714 23.573610
+sir  153.05125 154.52052 160.49197  2.828362  8.774453  2.709466
+map   51.67744  54.92715  55.71499  0.000000  5.603065  0.000000
+> tail(data)   # Muestra las últimas filas
+         C2.TPM   C1.TPM    C3.TPM   X1W5.TPM   X1W6.TPM   X1W5.COV
+holB  26.528334 25.11444  25.84524   0.000000  14.037302   0.000000
+xseA   4.958211 10.49672  13.32347   0.000000   8.579851   0.000000
+ccsB  79.833740 52.41565  56.37512 108.076942  77.530563 103.533722
+glnA 100.763817 97.39648  90.88831  78.461060 109.376648  75.162804
+alaS  27.634129 23.34384  26.04073   9.950721  15.988743   9.532423
+hisH 145.615585 68.18367 105.57125  44.589828 103.541252  42.715408
+> 
+> 
+> ### 2.- En nuestra tabla tenemos los valores de 619 genes para tres réplicas
+> ### del Control y tres réplicas de una Condición. Calcula la media y la desviación
+> ### estándar del control y del tratamiento para cada gen. Puedes emplear cualquier
+> ### función que consideres como apply(). Añade esos valores como columnas nuevas a tu tabla original. 
+> ### Serán 4 columnas nuevas en total, la media de Control, la DE de Control, la media de Condición y la DE de Condición. (1,5 pto)
+> 
+> 
+> # Separar los grupos de control y condición
+> control <- data[, 1:3]
+> condicion <- data[, 4:6]
+> 
+> # Calcular medias y desviaciones estándar por fila (margin = 1)
+> control.mean <- apply(control, 1, mean)
+> control.sd   <- apply(control, 1, sd)
+> cond.mean    <- apply(condicion, 1, mean)
+> cond.sd      <- apply(condicion, 1, sd)
+> 
+> # Añadir las 4 columnas nuevas a la tabla original
+> data$Control_Mean <- control.mean
+> data$Control_SD   <- control.sd
+> data$Cond_Mean    <- cond.mean
+> data$Cond_SD      <- cond.sd
+> 
+> # Verificar el resultado
+> head(data)
+        C2.TPM    C1.TPM    C3.TPM  X1W5.TPM  X1W6.TPM  X1W5.COV Control_Mean Control_SD
+urtA  30.40059  34.71058  32.35147  0.000000  0.000000  0.000000     32.48754   2.158215
+recQ 101.01847 107.75805 107.83519  3.457582 10.163883  3.312236    105.53724   3.913556
+kdsA  60.78179  57.62743  59.47843  0.000000 12.250913  0.000000     59.29588   1.585084
+lysA 129.41655 109.94573 126.75361 24.608057 32.755714 23.573610    122.03863  10.557057
+sir  153.05125 154.52052 160.49197  2.828362  8.774453  2.709466    156.02125   3.940839
+map   51.67744  54.92715  55.71499  0.000000  5.603065  0.000000     54.10653   2.140215
+     Cond_Mean  Cond_SD
+urtA  0.000000 0.000000
+recQ  5.644567 3.914517
+kdsA  4.083638 7.073068
+lysA 26.979127 5.029338
+sir   4.770760 3.467809
+map   1.867688 3.234931
+> 
+> 
+> ### 3.- En una sola imagen, muestra un histograma para la media del Control y otro para la media de la Condicíon.
+> ### Pon colores diferentes en cada uno y mantén esos colores para el resto del trabajo. (1 pto).
+> # Definir colores fijos para el trabajo
+> col_control <- "skyblue"
+> col_cond    <- "orange"
+> 
+> # Dividir la ventana gráfica en 1 fila y 2 columnas
+> par(mfrow = c(1, 2))
+> 
+> hist(data$Control_Mean, col = col_control, 
++      main = "Media - Control", xlab = "Media TPM", ylab = "Frecuencia")
+> 
+> hist(data$Cond_Mean, col = col_cond, 
++      main = "Media - Condición", xlab = "Media TPM", ylab = "Frecuencia")
+> 
+> # Restaurar la ventana gráfica por defecto
+> par(mfrow = c(1, 1))
+> 
+> 
+> ### 4.- En una sola imagen, muestra un boxplot para la condición y otro para el control. 
+> ### Añade el título, colores y una una leyenda en la esquina superior izquierda. ( 1,5 pto)
+> 
+> # Combinar las réplicas en un data.frame para el boxplot
+> boxplot_data <- data.frame(
++   C1 = control[,1], C2 = control[,2], C3 = control[,3],
++   K1 = condicion[,1], K2 = condicion[,2], K3 = condicion[,3]
++ )
+> 
+> # Generar el boxplot
+> boxplot(boxplot_data, 
++         col = c(rep(col_control, 3), rep(col_cond, 3)),
++         main = "Distribución de Expresión - Control vs Condición",
++         ylab = "Valores de Expresión (TPM)",
++         las = 2)
+> 
+> # Añadir leyenda en la esquina superior izquierda
+> legend("topleft", legend = c("Control", "Condición"), 
++        fill = c(col_control, col_cond), cex = 0.8)
+> 
+> ### 5.- Evalúa la normalidad de Control y Condición y acorde con los resultados, haz lo siguiente: (2 pto)
+> ### 		Realiza un test de comparativa de medias para cada gen entre condición y control. 
+> ###			Guarda el p-value de la comparativa y anádelo como una columna extra a tu tabla original.
+> 
+> # Inicializar vector para guardar los p-values
+> pvalue <- numeric(nrow(data))
+> 
+> # Bucle para realizar el t-test gen a gen
+> for(i in 1:nrow(data)) {
++   x <- as.numeric(control[i,])
++   y <- as.numeric(condicion[i,])
++   
++   # Test t de Student para dos muestras independientes
++   t_res <- t.test(x, y)
++   pvalue[i] <- t_res$p.value
++ }
+> 
+> # Añadir el p-value como columna extra a la tabla
+> data$p_value <- pvalue
+> head(data)
+        C2.TPM    C1.TPM    C3.TPM  X1W5.TPM  X1W6.TPM  X1W5.COV Control_Mean Control_SD
+urtA  30.40059  34.71058  32.35147  0.000000  0.000000  0.000000     32.48754   2.158215
+recQ 101.01847 107.75805 107.83519  3.457582 10.163883  3.312236    105.53724   3.913556
+kdsA  60.78179  57.62743  59.47843  0.000000 12.250913  0.000000     59.29588   1.585084
+lysA 129.41655 109.94573 126.75361 24.608057 32.755714 23.573610    122.03863  10.557057
+sir  153.05125 154.52052 160.49197  2.828362  8.774453  2.709466    156.02125   3.940839
+map   51.67744  54.92715  55.71499  0.000000  5.603065  0.000000     54.10653   2.140215
+     Cond_Mean  Cond_SD      p_value
+urtA  0.000000 0.000000 1.467835e-03
+recQ  5.644567 3.914517 6.242757e-06
+kdsA  4.083638 7.073068 3.888749e-03
+lysA 26.979127 5.029338 9.872842e-04
+sir   4.770760 3.467809 1.155375e-06
+map   1.867688 3.234931 6.146373e-05
+> 
+> 
+> 
+> ### 6.- De los resultados del apartado 5, saca (mediante código) un listado de los genes diferencialmente expresados (aquellos que tengan un pvalue < 0.05)
+> ### ¿Cuántos genes tienes? Sino te sale ninguno, justifica por qué. En caso de que sí que te salgan, ¿cuántos salen sobreexpresados y cuántos reprimidos? (1 pto)
+> 
+> # Filtrar genes con p-value < 0.05
+> genes_DE <- data[data$p_value < 0.05, ]
+> num_genes_DE <- nrow(genes_DE)
+> 
+> cat("Número total de genes diferencialmente expresados (p < 0.05):", num_genes_DE, "\n")
+Número total de genes diferencialmente expresados (p < 0.05): 362 
+> 
+> # Contar sobreexpresados y reprimidos (comparando medias de condición frente a control)
+> sobreexpresados <- sum(data$p_value < 0.05 & (data$Cond_Mean > data$Control_Mean))
+> reprimidos       <- sum(data$p_value < 0.05 & (data$Cond_Mean < data$Control_Mean))
+> 
+> cat("Genes sobreexpresados en Condición:", sobreexpresados, "\n")
+Genes sobreexpresados en Condición: 50 
+> cat("Genes reprimidos en Condición:", reprimidos, "\n")
+Genes reprimidos en Condición: 312 
+> 
+> 
+> 
+> ### 7.- Por último, realiza un heatmap de los genes diferencialmente expresados
+> ### Emplea la Práctica de R como referencia. (2 pts)
+> 
+> # Extraer la matriz de expresión solo para los genes diferencialmente expresados
+> mat_filtrada <- as.matrix(data[data$p_value < 0.05, 1:6])
+> 
+> # Comprobar si hay suficientes genes para el clustering jerárquico
+> if(nrow(mat_filtrada) > 1) {
++   rowv <- as.dendrogram(hclust(as.dist(1 - cor(t(mat_filtrada)))))
++   colv <- as.dendrogram(hclust(as.dist(1 - cor(mat_filtrada))))
++   
++   # Generar el heatmap
++   heatmap(mat_filtrada, Rowv = rowv, Colv = colv, cexCol = 0.7, labRow = FALSE,
++           main = "Heatmap - Genes Diferencialmente Expresados",
++           col = hcl.colors(50, "YlOrRd"))
++ } else {
++   cat("El número de genes filtrados es muy pequeño para realizar el clustering.\n")
++ }
+> 
