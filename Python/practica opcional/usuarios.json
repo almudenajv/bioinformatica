@@ -1,0 +1,25 @@
+[
+    {
+        "id": 1,
+        "nombre": "ana",
+        "roles": [
+            "admin",
+            "user"
+        ]
+    },
+    {
+        "id": 2,
+        "nombre": "luis",
+        "roles": [
+            "user"
+        ]
+    },
+    {
+        "id": 3,
+        "nombre": "marta",
+        "roles": [
+            "user",
+            "moderator"
+        ]
+    }
+]
